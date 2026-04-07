@@ -1,2 +1,48 @@
-User-Agent: *
-Disallow:
+# robots.txt for PowerHouse Industrial Lighting
+User-agent: *
+Allow: /
+Disallow: /private/
+Disallow: /admin/
+Disallow: /tmp/
+
+# Sitemap location
+Sitemap: https://powerhouse-lighting.com/sitemap.xml
+
+# Crawl delay (if needed)
+# Crawl-delay: 10
+
+# Googlebot specific rules
+User-agent: Googlebot
+Allow: /
+Disallow: /private/
+
+# Bingbot specific rules
+User-agent: bingbot
+Allow: /
+Disallow: /private/
+
+# Other search engine bots
+User-agent: YandexBot
+Allow: /
+Disallow: /private/
+
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /private/
+
+User-agent: Baiduspider
+Allow: /
+Disallow: /private/
+
+# Social media crawlers
+User-agent: Twitterbot
+Allow: /
+Disallow: /private/
+
+User-agent: FacebookExternalHit
+Allow: /
+Disallow: /private/
+
+User-agent: LinkedInBot
+Allow: /
+Disallow: /private/

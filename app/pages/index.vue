@@ -1,5 +1,7 @@
 <template>
   <div>
+
+    
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-gray-900 to-blue-900 text-white py-20">
       <div class="container mx-auto px-4">
@@ -140,4 +142,11 @@
 </template>
 
 <script setup lang="ts">
+import { generateSeoMeta, seoConfigs } from '@/utils/seo'
+
+// Define page meta for SEO
+definePageMeta({
+  // SEO configuration for the home page
+  ...generateSeoMeta(seoConfigs.home),
+})
 </script>

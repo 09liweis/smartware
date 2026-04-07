@@ -213,4 +213,11 @@
 </template>
 
 <script setup lang="ts">
+import { generateSeoMeta, seoConfigs } from '@/utils/seo'
+
+// Define page meta for SEO
+definePageMeta({
+  // SEO configuration for the contact page
+  ...generateSeoMeta(seoConfigs.contact),
+})
 </script>
