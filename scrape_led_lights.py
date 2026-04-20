@@ -6,6 +6,8 @@ Parses product listing page, then visits each product detail page to extract:
 - description
 - images (from swiper-slide rel attribute)
 - table data
+
+Output: JSON grouped by category name (from main-class-item classify active)
 """
 
 import requests
@@ -24,7 +26,7 @@ LISTING_URLS = [
     "https://sst-smartware.com/Product/639521.html",
 ]
 
-# Create a session to maintain cookies and CSRF tokens
+# Create a session to maintain cookies
 session = requests.Session()
 session.headers.update({
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -38,21 +40,7 @@ session.headers.update({
 })
 
 
-def init_session():
-    """Initialize session by visiting homepage to get cookies."""
-    try:
-        print("Initializing session...")
-        response = session.get(BASE_URL, timeout=30)
-        response.raise_for_status()
-        time.sleep(3)
-        print(f"Session initialized. Cookies: {dict(session.cookies)}")
-        return True
-    except Exception as e:
-        print(f"Failed to initialize session: {e}")
-        return False
-
-
-def fetch_html(url, delay_range=(4, 8)):
+def fetch_html(url, delay_range=(5, 10)):
     """Fetch HTML content from a URL with session handling and random delays."""
     sleep_time = random.uniform(delay_range[0], delay_range[1])
     time.sleep(sleep_time)
@@ -70,12 +58,14 @@ def get_category_name(html):
     """Extract category name from the active menu item."""
     soup = BeautifulSoup(html, 'html.parser')
     
+    # Look for the active classification element
     active_item = soup.find(class_='main-class-item classify active')
     if active_item:
         anchor = active_item.find('a')
         if anchor:
             return anchor.get_text(strip=True)
     
+    # Fallback: try to get from page title or h1
     h1 = soup.find('h1')
     if h1:
         return h1.get_text(strip=True)
@@ -91,6 +81,7 @@ def get_category_name(html):
 
 
 def get_product_links(html):
+    """Extract product links from listing page."""
     soup = BeautifulSoup(html, 'html.parser')
     products = []
     product_items = soup.find_all(class_=re.compile(r'pro-item\s+col-xs-2'))
@@ -114,9 +105,11 @@ def get_product_links(html):
 
 
 def parse_product_detail(html, product_url):
+    """Parse product detail page HTML."""
     soup = BeautifulSoup(html, 'html.parser')
     data = {'name': None, 'description': None, 'images': [], 'table_data': {}}
     
+    # Extract product name
     name_selectors = ['h1.product-title', 'h1.pro-title', '.product-name h1', '.pro-detail h1', 'h1', '.product-info h2', '.pro-info h3']
     for selector in name_selectors:
         name_elem = soup.select_one(selector)
@@ -124,6 +117,7 @@ def parse_product_detail(html, product_url):
             data['name'] = name_elem.get_text(strip=True)
             break
     
+    # Extract description
     desc_selectors = ['.product-description', '.pro-description', '.product-detail', '.pro-detail', '.description', '[class*="desc"]']
     for selector in desc_selectors:
         desc_elem = soup.select_one(selector)
@@ -133,6 +127,7 @@ def parse_product_detail(html, product_url):
                 data['description'] = desc_text
                 break
     
+    # Extract images from swiper-slide rel attribute
     swiper_slides = soup.find_all(class_='swiper-slide')
     for slide in swiper_slides:
         rel_attr = slide.get('rel')
@@ -153,6 +148,7 @@ def parse_product_detail(html, product_url):
                         src = BASE_URL + '/' + src
                     data['images'].append(src)
     
+    # Fallback image selectors
     if not data['images']:
         img_selectors = ['.product-gallery img', '.pro-gallery img', '.product-image img', '.gallery img', '.zoompic img']
         for selector in img_selectors:
@@ -167,6 +163,7 @@ def parse_product_detail(html, product_url):
                     if src not in data['images']:
                         data['images'].append(src)
     
+    # Extract table data
     tables = soup.find_all('table')
     for table in tables:
         rows = table.find_all('tr')
@@ -178,6 +175,7 @@ def parse_product_detail(html, product_url):
                 if key and value:
                     data['table_data'][key] = value
     
+    # Also try definition lists
     dl_elements = soup.find_all('dl')
     for dl in dl_elements:
         dt = dl.find('dt')
@@ -197,7 +195,7 @@ def process_listing_url(listing_url):
     print(f"Processing listing: {listing_url}")
     print(f"{'=' * 60}")
     
-    listing_html = fetch_html(listing_url)
+    listing_html = fetch_html(listing_url, delay_range=(3, 6))
     if not listing_html:
         print(f"Failed to fetch listing page: {listing_url}")
         return None, []
@@ -225,7 +223,7 @@ def process_listing_url(listing_url):
     
     for i, product in enumerate(products, 1):
         print(f"  Processing {i}/{len(products)}: {product['url']}")
-        product_html = fetch_html(product['url'])
+        product_html = fetch_html(product['url'], delay_range=(4, 8))
         if product_html:
             detail_data = parse_product_detail(product_html, product['url'])
             detail_data['source_url'] = product['url']
@@ -240,12 +238,11 @@ def process_listing_url(listing_url):
 
 def main():
     print("=" * 60)
-    print("LED Light Data Scraper - Multiple Categories")
+    print("LED Light Data Scraper")
     print("=" * 60)
-    
-    # Initialize session first
-    if not init_session():
-        print("Warning: Session initialization failed, continuing anyway...")
+    print("\nNote: This site has CSRF protection. Some requests may fail.")
+    print("For best results, run this script on a system with GUI browser access.")
+    print("=" * 60)
     
     # Process each listing URL and group results by category name
     grouped_results = {}
