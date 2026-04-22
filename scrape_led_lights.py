@@ -16,18 +16,41 @@ import json
 import time
 import re
 import random
+from urllib.parse import urljoin
+
+# Try to import Selenium for JavaScript-rendered pages
+try:
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.chrome.options import Options as ChromeOptions
+    from selenium.webdriver.firefox.options import Options as FirefoxOptions
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.firefox.service import Service as FirefoxService
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    SELENIUM_AVAILABLE = True
+    SELENIUM_BROWSER = None  # Will be set to 'chrome' or 'firefox'
+except ImportError:
+    SELENIUM_AVAILABLE = False
+    print("Note: Selenium not installed. Run: pip install selenium")
 
 BASE_URL = "https://sst-smartware.com"
 LISTING_URLS = [
     "https://sst-smartware.com/Product/639505.html",
+    "https://sst-smartware.com/Product/639505.html?PageNo=2&ClassID=639505&responseModuleId=672112394",
     "https://sst-smartware.com/Product/639513.html",
+    "https://sst-smartware.com/Product/639513.html?PageNo=2&ClassID=639513&responseModuleId=672112394",
+    "https://sst-smartware.com/Product/639513.html?PageNo=3&ClassID=639513&responseModuleId=672112394",
     "https://sst-smartware.com/Product/639456.html",
     "https://sst-smartware.com/Product/639515.html",
+    "https://sst-smartware.com/Product/639515.html?PageNo=2&ClassID=639515&responseModuleId=672112394",
     "https://sst-smartware.com/Product/639521.html",
+    "https://sst-smartware.com/Product/639521.html?PageNo=2&ClassID=639521&responseModuleId=672112394",
 ]
 
 # Create a session to maintain cookies
 session = requests.Session()
+session.last_html = None  # Store last HTML for CSRF token extraction
 session.headers.update({
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -37,20 +60,184 @@ session.headers.update({
     'DNT': '1',
     'Connection': 'keep-alive',
     'Upgrade-Insecure-Requests': '1',
+    'X-Requested-With': 'XMLHttpRequest',  # Helps bypass some CSRF checks
 })
 
 
-def fetch_html(url, delay_range=(5, 10)):
+def fetch_html(url, delay_range=(5, 10), use_csrf=True):
     """Fetch HTML content from a URL with session handling and random delays."""
     sleep_time = random.uniform(delay_range[0], delay_range[1])
     time.sleep(sleep_time)
     
+    # Try requests first with CSRF handling
+    for attempt in range(2):
+        # Extract and update CSRF token before request
+        if use_csrf and hasattr(session, 'last_html') and session.last_html:
+            csrf_token = extract_csrf_token(session.last_html)
+            if csrf_token:
+                # Try different header names the server might expect
+                session.headers.update({
+                    'X-CSRF-Token': csrf_token,
+                    'X-Csrf-Token': csrf_token,
+                    'X-xsrf-token': csrf_token,
+                    'X-XSRF-TOKEN': csrf_token,
+                })
+        
+        try:
+            response = session.get(url, timeout=30)
+            if response.status_code == 403:
+                print(f"  403 Forbidden - trying cookie token...")
+                # Try token from cookies
+                cookies = session.cookies.get_dict()
+                for cookie_name in ['csrfToken', 'csrf_token', '_csrf', 'xsrf', 'XSRF-TOKEN']:
+                    if cookie_name in cookies:
+                        session.headers.update({'X-CSRF-Token': cookies[cookie_name]})
+                        break
+                continue
+            
+            response.raise_for_status()
+            session.last_html = response.text
+            return response.text
+        except requests.RequestException as e:
+            if attempt < 1 and ('403' in str(e) or 'Forbidden' in str(e)):
+                print(f"  Attempt {attempt + 1} failed, retrying...")
+                time.sleep(2)
+                continue
+            print(f"  Requests failed: {e}")
+            break
+    
+    # Fallback to Selenium if available
+    if SELENIUM_AVAILABLE:
+        print(f"  Falling back to Selenium for: {url}")
+        return fetch_with_selenium(url, delay_range)
+    
+    print(f"Error fetching {url}")
+    return None
+
+
+def extract_csrf_token(html, debug=False):
+    """Extract CSRF token from HTML page (meta tags, hidden inputs, or data attributes)."""
+    if not html:
+        return None
+    
+    soup = BeautifulSoup(html, 'html.parser')
+    found_tokens = []
+    
+    # Method 1: Look for meta tag with CSRF token
+    meta_token = soup.find('meta', {'name': re.compile(r'csrf-token|csrftoken|xsrf-token', re.I)})
+    if meta_token and meta_token.get('content'):
+        found_tokens.append(('meta-name', meta_token['content']))
+    
+    # Method 2: Look for meta tag with property (some sites use this)
+    meta_property = soup.find('meta', {'property': re.compile(r'csrf-token|csrftoken', re.I)})
+    if meta_property and meta_property.get('content'):
+        found_tokens.append(('meta-property', meta_property['content']))
+    
+    # Method 3: Look for meta http-equiv (some sites use this)
+    meta_equiv = soup.find('meta', {'http-equiv': re.compile(r'csrf|csrf-token', re.I)})
+    if meta_equiv and meta_equiv.get('content'):
+        found_tokens.append(('meta-http-equiv', meta_equiv['content']))
+    
+    # Method 4: Look for hidden input with CSRF token
+    hidden_input = soup.find('input', {'type': 'hidden', 'name': re.compile(r'csrf|_token|csrf_token|csrftoken|xsrf', re.I)})
+    if hidden_input and hidden_input.get('value'):
+        found_tokens.append(('hidden-input', hidden_input['value']))
+    
+    # Method 5: Look for ANY hidden input with value that looks like a token
+    for inp in soup.find_all('input', {'type': 'hidden'}):
+        val = inp.get('value', '')
+        if len(val) > 20 and re.match(r'^[a-zA-Z0-9_-]+$', val):
+            found_tokens.append(('hidden-generic', val))
+    
+    # Method 6: Look for data-* attributes containing csrf
+    data_inputs = soup.find_all('input', {'data-csrf': True})
+    if data_inputs:
+        found_tokens.append(('data-attr', data_inputs[0].get('data-csrf')))
+    
+    # Method 7: Look in script tags for token assignments
+    scripts = soup.find_all('script')
+    for script in scripts:
+        script_text = script.string or ''
+        # Match various patterns: csrfToken, CSRF_TOKEN, csrf_token, etc.
+        match = re.search(r'(?:csrf[_-]?token|xsrf[_-]?token)\s*[:=]\s*["\']([^"\']{10,})["\']', script_text, re.I)
+        if match:
+            found_tokens.append(('script', match.group(1)))
+        
+        # Also try to find base64-like tokens
+        match2 = re.search(r'token["\']?\s*[:=]\s*["\']([A-Za-z0-9+/=]{20,})["\']', script_text)
+        if match2:
+            found_tokens.append(('script-base64', match2.group(1)))
+    
+    if debug and found_tokens:
+        print(f"  Found {len(found_tokens)} potential tokens")
+        for src, tok in found_tokens[:3]:
+            print(f"    {src}: {tok[:30]}...")
+    
+    # Return the first valid-looking token
+    if found_tokens:
+        return found_tokens[0][1]
+    
+    return None
+
+
+def extract_form_token(html, form_action_url=None):
+    """Extract tokens from forms that may be needed for subsequent requests."""
+    if not html:
+        return {}
+    
+    soup = BeautifulSoup(html, 'html.parser')
+    tokens = {}
+    
+    # Find all hidden inputs
+    hidden_inputs = soup.find_all('input', {'type': 'hidden'})
+    for inp in hidden_inputs:
+        name = inp.get('name')
+        value = inp.get('value', '')
+        if name and value:
+            tokens[name] = value
+    
+    # Find forms and extract action URL
+    if form_action_url:
+        forms = soup.find_all('form')
+        for form in forms:
+            action = form.get('action', '')
+            full_action = urljoin(BASE_URL, action) if not action.startswith('http') else action
+            if form_action_url in full_action:
+                inputs = form.find_all('input', {'type': 'hidden'})
+                for inp in inputs:
+                    name = inp.get('name')
+                    value = inp.get('value', '')
+                    if name:
+                        tokens[name] = value
+    
+    return tokens
+
+
+def post_with_csrf(url, data=None, delay_range=(5, 10)):
+    """Make a POST request with CSRF token handling."""
+    sleep_time = random.uniform(delay_range[0], delay_range[1])
+    time.sleep(sleep_time)
+    
+    # Get CSRF token from session's last HTML
+    if hasattr(session, 'last_html'):
+        csrf_token = extract_csrf_token(session.last_html)
+        if csrf_token:
+            session.headers.update({'X-CSRF-Token': csrf_token})
+    
+    # Also try to get token from existing cookies
+    cookies = session.cookies.get_dict()
+    if 'csrf_token' in cookies:
+        session.headers.update({'X-CSRF-Token': cookies['csrf_token']})
+    elif '_csrf' in cookies:
+        session.headers.update({'X-CSRF-Token': cookies['_csrf']})
+    
     try:
-        response = session.get(url, timeout=30)
+        response = session.post(url, data=data, timeout=30)
         response.raise_for_status()
-        return response.text
+        session.last_html = response.text
+        return response
     except requests.RequestException as e:
-        print(f"Error fetching {url}: {e}")
+        print(f"Error POSTing to {url}: {e}")
         return None
 
 
@@ -189,37 +376,46 @@ def parse_product_detail(html, product_url):
     return data
 
 
-def process_listing_url(listing_url):
-    """Process a single listing URL and return its category name and products."""
+def process_listing_url(listing_url, all_products_data=None, page_count=1):
+    """Process a single listing URL and return its category name and products.
+    Handles pagination by checking for page-more class."""
     print(f"\n{'=' * 60}")
-    print(f"Processing listing: {listing_url}")
+    print(f"Processing listing: {listing_url} (page {page_count})")
     print(f"{'=' * 60}")
+    
+    if all_products_data is None:
+        all_products_data = []
     
     listing_html = fetch_html(listing_url, delay_range=(3, 6))
     if not listing_html:
         print(f"Failed to fetch listing page: {listing_url}")
-        return None, []
+        return None, all_products_data
     
-    category_name = get_category_name(listing_html)
-    if category_name:
-        print(f"Category: {category_name}")
+    # Get category name only on first page
+    if page_count == 1:
+        category_name = get_category_name(listing_html)
+        if category_name:
+            print(f"Category: {category_name}")
+        else:
+            category_name = listing_url
     else:
+        # Use stored category name for subsequent pages
         category_name = listing_url
     
     products = get_product_links(listing_html)
-    print(f"Found {len(products)} products")
+    print(f"Found {len(products)} products on page {page_count}")
     
     if not products:
         print("No products found. The page structure may have changed.")
-        return category_name, []
+        return category_name if page_count == 1 else None, all_products_data
     
-    for i, p in enumerate(products[:5], 1):
-        print(f"  {i}. {p['name_from_listing'] or 'Unknown'}")
-    if len(products) > 5:
-        print(f"  ... and {len(products) - 5} more")
+    if page_count == 1:
+        for i, p in enumerate(products[:5], 1):
+            print(f"  {i}. {p['name_from_listing'] or 'Unknown'}")
+        if len(products) > 5:
+            print(f"  ... and {len(products) - 5} more")
     
-    print(f"\nScraping product details...")
-    all_products_data = []
+    print(f"\nScraping product details from page {page_count}...")
     
     for i, product in enumerate(products, 1):
         print(f"  Processing {i}/{len(products)}: {product['url']}")
@@ -233,16 +429,138 @@ def process_listing_url(listing_url):
         else:
             print(f"    Failed to fetch product page")
     
-    return category_name, all_products_data
+    return category_name if page_count == 1 else None, all_products_data
+
+
+def get_selenium_driver():
+    """Create a headless driver for JavaScript rendering (Chrome, Brave, or Firefox)."""
+    if not SELENIUM_AVAILABLE:
+        return None, None
+    
+    # Try Chrome first
+    chrome_options = ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--window-size=1920,1080')
+    chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+    
+    try:
+        driver = webdriver.Chrome(options=chrome_options)
+        print("  Using Chrome for Selenium")
+        return driver, 'chrome'
+    except Exception as e:
+        print(f"  Chrome not available: {e}")
+    
+    # Try Brave
+    brave_options = ChromeOptions()
+    brave_options.add_argument('--headless')
+    brave_options.add_argument('--no-sandbox')
+    brave_options.add_argument('--disable-dev-shm-usage')
+    brave_options.add_argument('--disable-gpu')
+    brave_options.add_argument('--window-size=1920,1080')
+    brave_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+    brave_options.binary_location = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
+    
+    try:
+        driver = webdriver.Chrome(options=brave_options)
+        print("  Using Brave Browser for Selenium")
+        return driver, 'brave'
+    except Exception as e:
+        print(f"  Brave not available: {e}")
+    
+    # Try Firefox
+    firefox_options = FirefoxOptions()
+    firefox_options.add_argument('--headless')
+    firefox_options.add_argument('--width=1920')
+    firefox_options.add_argument('--height=1080')
+    
+    try:
+        driver = webdriver.Firefox(options=firefox_options)
+        print("  Using Firefox for Selenium")
+        return driver, 'firefox'
+    except Exception as e:
+        print(f"  Firefox not available: {e}")
+        return None, None
+
+
+def fetch_with_selenium(url, delay_range=(3, 5)):
+    """Fetch page using Selenium (JavaScript rendering)."""
+    if not SELENIUM_AVAILABLE:
+        return None
+    
+    driver, browser = get_selenium_driver()
+    if not driver:
+        print(f"  No browser available for Selenium")
+        return None
+    
+    print(f"  [Selenium/{browser}] Fetching: {url}")
+    
+    try:
+        driver.get(url)
+        time.sleep(random.uniform(delay_range[0], delay_range[1]))
+        
+        # Wait for page to load
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        
+        html = driver.page_source
+        driver.quit()
+        return html
+    except Exception as e:
+        print(f"  [Selenium] Error: {e}")
+        try:
+            driver.quit()
+        except:
+            pass
+        return None
+
+
+def test_site_connection():
+    """Test connection and debug CSRF token extraction."""
+    print("\n" + "=" * 60)
+    print("Testing site connection and CSRF handling...")
+    print("=" * 60)
+    
+    try:
+        response = session.get(BASE_URL + '/', timeout=30)
+        print(f"Status: {response.status_code}")
+        print(f"Cookies: {dict(session.cookies)}")
+        
+        csrf = extract_csrf_token(response.text, debug=True)
+        if csrf:
+            print(f"Extracted CSRF token: {csrf[:50]}...")
+            session.last_html = response.text
+            return True
+        else:
+            # Save sample of HTML for debugging
+            print("\nNo token found. Saving HTML sample for analysis...")
+            with open('debug_page_sample.html', 'w', encoding='utf-8') as f:
+                f.write(response.text[:5000])
+            print("  Saved first 5000 chars to debug_page_sample.html")
+            session.last_html = response.text
+            return False
+    except Exception as e:
+        print(f"Connection error: {e}")
+        return False
 
 
 def main():
     print("=" * 60)
     print("LED Light Data Scraper")
     print("=" * 60)
-    print("\nNote: This site has CSRF protection. Some requests may fail.")
-    print("For best results, run this script on a system with GUI browser access.")
+    print("\nNote: This site has CSRF protection. Using token extraction.")
     print("=" * 60)
+    
+    # Test connection first
+    if not test_site_connection():
+        print("\n⚠️  Warning: Could not extract CSRF token from initial page.")
+        print("   The site may require JavaScript rendering (Selenium).")
+        print("   Trying anyway with standard requests...")
+    
+    time.sleep(2)
     
     # Process each listing URL and group results by category name
     grouped_results = {}
