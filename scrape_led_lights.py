@@ -310,6 +310,10 @@ def parse_product_detail(html, product_url):
         desc_elem = soup.select_one(selector)
         if desc_elem:
             desc_text = ' '.join(desc_elem.get_text(separator=' ', strip=True).split())
+            # Clean up multiple dashes and repeated hyphens
+            desc_text = re.sub(r'-{2,}', '', desc_text)  # Remove 2 or more consecutive dashes
+            desc_text = re.sub(r'\s+', ' ', desc_text)   # Normalize whitespace
+            desc_text = desc_text.strip()
             if len(desc_text) > 20:
                 data['description'] = desc_text
                 break
