@@ -33,7 +33,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <div class="bg-gradient-to-br from-blue-900 to-gray-900 text-white p-8 rounded-2xl shadow-xl">
             <h3 class="text-3xl font-bold mb-4">The ApexTower™ (Tripods)</h3>
-            <p class="text-xl text-blue-200 mb-6 italic">"The gold standard for portable site lighting."</p>
+            <p class="text-xl text-blue-200 mb-6 italic">The gold standard for portable site lighting.</p>
             <ul class="space-y-3">
               <li class="flex items-center">
                 <svg class="w-5 h-5 mr-3 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -58,7 +58,7 @@
           
           <div class="bg-gradient-to-br from-gray-900 to-blue-900 text-white p-8 rounded-2xl shadow-xl">
             <h3 class="text-3xl font-bold mb-4">The HorizonView™ (Light Bars)</h3>
-            <p class="text-xl text-blue-200 mb-6 italic">"Unmatched beam precision for heavy-duty fleets."</p>
+            <p class="text-xl text-blue-200 mb-6 italic">Unmatched beam precision for heavy-duty fleets.</p>
             <ul class="space-y-3">
               <li class="flex items-center">
                 <svg class="w-5 h-5 mr-3 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
