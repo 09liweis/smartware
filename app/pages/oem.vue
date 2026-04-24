@@ -1,19 +1,10 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-gray-900 to-blue-900 text-white py-20">
-      <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-5xl font-bold mb-6 leading-tight">
-            Your Brand, Powered by Our Precision.
-          </h1>
-          <p class="text-xl text-gray-300 mb-6 max-w-3xl mx-auto">
-            We don't just sell lights; we help you build your brand. From laser-etched logos to custom housing colors, 
-            we provide full-service OEM/ODM solutions for North American distributors.
-          </p>
-        </div>
-      </div>
-    </section>
+    <PageHero
+      title="Your Brand, Powered by Our Precision."
+      description="We don't just sell lights; we help you build your brand. From laser-etched logos to custom housing colors, we provide full-service OEM/ODM solutions for North American distributors."
+    />
 
     <!-- Customization Capabilities -->
     <section class="py-20 bg-gray-50">

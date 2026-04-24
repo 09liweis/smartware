@@ -1,15 +1,9 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-gray-900 to-blue-900 text-white py-20">
-      <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-5xl font-bold mb-6 leading-tight">
-            Bridging the Gap Between Quality and Cost
-          </h1>
-        </div>
-      </div>
-    </section>
+    <PageHero
+      title="Bridging the Gap Between Quality and Cost"
+    />
 
     <!-- Our Story -->
     <section class="py-20">

@@ -3,26 +3,19 @@
 
     
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-gray-900 to-blue-900 text-white py-20">
-      <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-5xl font-bold mb-6 leading-tight">
-            Industrial LED Lighting. Factory-Direct Pricing. North American Support.
-          </h1>
-          <p class="text-xl text-gray-300 mb-10 max-w-3xl mx-auto">
-            High-performance LED Tripods, Light Bars, and Work Lights engineered in Shenzhen and managed from Toronto.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg">
-              View Product Catalog
-            </button>
-            <button class="bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
-              Request Wholesale Quote
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <PageHero
+      title="Industrial LED Lighting. Factory-Direct Pricing. North American Support."
+      description="High-performance LED Tripods, Light Bars, and Work Lights engineered in Shenzhen and managed from Toronto."
+    >
+      <template #actions>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg">
+          View Product Catalog
+        </button>
+        <button class="bg-transparent border-2 border-white hover:bg-white hover:text-gray-900 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
+          Request Wholesale Quote
+        </button>
+      </template>
+    </PageHero>
 
     <!-- Why Us Section -->
     <section class="py-20 bg-gray-50">

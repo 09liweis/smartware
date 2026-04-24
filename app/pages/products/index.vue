@@ -1,18 +1,10 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-gray-900 to-blue-900 text-white py-20">
-      <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-5xl font-bold mb-6 leading-tight">
-            LED Work Lights
-          </h1>
-          <p class="text-xl text-gray-300 mb-6">
-            Professional-grade rechargeable LED work lights for industrial, emergency, and outdoor applications
-          </p>
-        </div>
-      </div>
-    </section>
+    <PageHero
+      title="LED Work Lights"
+      description="Professional-grade rechargeable LED work lights for industrial, emergency, and outdoor applications"
+    />
 
     <!-- Products Grid -->
     <section class="py-20">

@@ -1,18 +1,10 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-gray-900 to-blue-900 text-white py-20">
-      <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-5xl font-bold mb-6 leading-tight">
-            Get a Factory-Direct Quote Today
-          </h1>
-          <p class="text-xl text-gray-300 mb-6 max-w-3xl mx-auto">
-            Whether you need a container of light bars or a custom-branded tripod line, our team is ready to assist.
-          </p>
-        </div>
-      </div>
-    </section>
+    <PageHero
+      title="Get a Factory-Direct Quote Today"
+      description="Whether you need a container of light bars or a custom-branded tripod line, our team is ready to assist."
+    />
 
     <!-- Contact Information -->
     <section class="py-20">

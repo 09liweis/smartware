@@ -1,24 +1,13 @@
 <template>
   <div v-if="product">
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-gray-900 to-blue-900 text-white py-16">
-      <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto">
-          <button
-            class="text-gray-300 hover:text-white mb-4 flex items-center gap-2"
-            @click="$router.back()"
-          >
-            ← Back to Products
-          </button>
-          <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-            {{ product.name }}
-          </h1>
-          <p class="text-xl text-gray-300">
-            {{ product.description?.substring(0, 200) }}...
-          </p>
-        </div>
-      </div>
-    </section>
+    <PageHero
+      :title="product.name"
+      :subtitle="product.description?.substring(0, 200) + '...'"
+      :centered="false"
+      show-back-button
+      back-button-text="Back to Products"
+    />
 
     <!-- Product Details -->
     <section class="py-16">

@@ -1,18 +1,10 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-gray-900 to-blue-900 text-white py-20">
-      <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-5xl font-bold mb-6 leading-tight">
-            The Knowledge Hub
-          </h1>
-          <p class="text-xl text-gray-300 mb-6 max-w-3xl mx-auto">
-            Industry insights, technical expertise, and innovation updates from the PowerHouse team
-          </p>
-        </div>
-      </div>
-    </section>
+    <PageHero
+      title="The Knowledge Hub"
+      description="Industry insights, technical expertise, and innovation updates from the PowerHouse team"
+    />
 
     <!-- Category Filter -->
     <section class="py-8 bg-gray-50">
