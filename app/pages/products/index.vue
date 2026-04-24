@@ -17,16 +17,50 @@
     <!-- Products Grid -->
     <section class="py-20">
       <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
+        <div class="text-center mb-12">
           <h2 class="text-4xl font-bold mb-6">Our Products</h2>
           <p class="text-gray-600 max-w-2xl mx-auto text-lg">
             Explore our full range of high-performance LED lighting solutions
           </p>
         </div>
 
+        <!-- Category Filters -->
+        <div class="flex flex-wrap justify-center gap-3 mb-12">
+          <button
+            :class="[
+              'px-6 py-2 rounded-full font-medium transition-colors',
+              selectedCategory === null
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            ]"
+            @click="selectedCategory = null"
+          >
+            All Products ({{ totalProductCount }})
+          </button>
+          <button
+            v-for="(products, category) in categorizedProducts"
+            :key="category"
+            :class="[
+              'px-6 py-2 rounded-full font-medium transition-colors',
+              selectedCategory === category
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            ]"
+            @click="selectedCategory = category"
+          >
+            {{ category }} ({{ products.length }})
+          </button>
+        </div>
+
+        <!-- Products Count -->
+        <div class="mb-6 text-gray-600">
+          Showing {{ filteredProducts.length }} product{{ filteredProducts.length !== 1 ? 's' : '' }}
+          <span v-if="selectedCategory">in {{ selectedCategory }}</span>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div
-            v-for="product in allProducts"
+            v-for="product in filteredProducts"
             :key="product.name"
             class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer"
             @click="navigateToProduct(product.name)"
@@ -60,6 +94,11 @@
             </div>
           </div>
         </div>
+
+        <!-- Empty State -->
+        <div v-if="filteredProducts.length === 0" class="text-center py-16">
+          <p class="text-gray-500 text-lg">No products found in this category.</p>
+        </div>
       </div>
     </section>
   </div>
@@ -81,15 +120,32 @@ definePageMeta({
   ...generateSeoMeta(seoConfigs.products),
 })
 
-// Flatten all products from all categories
-const allProducts = computed<Product[]>(() => {
-  const products: Product[] = []
-  for (const category of Object.values(ledLightsData)) {
-    if (Array.isArray(category)) {
-      products.push(...category)
+// Get categorized products from JSON
+const categorizedProducts = computed<Record<string, Product[]>>(() => {
+  const result: Record<string, Product[]> = {}
+  for (const [category, products] of Object.entries(ledLightsData)) {
+    if (Array.isArray(products)) {
+      result[category] = products
     }
   }
-  return products
+  return result
+})
+
+// Selected category filter
+const selectedCategory = ref<string | null>(null)
+
+// Total product count
+const totalProductCount = computed(() => {
+  return Object.values(categorizedProducts.value).reduce((sum, products) => sum + products.length, 0)
+})
+
+// Filtered products based on selected category
+const filteredProducts = computed<Product[]>(() => {
+  if (selectedCategory.value) {
+    return categorizedProducts.value[selectedCategory.value] || []
+  }
+  // Return all products when no category selected
+  return Object.values(categorizedProducts.value).flat()
 })
 
 const router = useRouter()
