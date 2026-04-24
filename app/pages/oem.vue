@@ -137,37 +137,19 @@
             A streamlined workflow from concept to delivery
           </p>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <div class="text-center">
-            <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">1</div>
-            <h3 class="text-2xl font-bold mb-4">Discovery</h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+          <div
+            v-for="step in processSteps"
+            :key="step.number"
+            class="text-center"
+          >
+            <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+              {{ step.number }}
+            </div>
+            <h3 class="text-2xl font-bold mb-4">{{ step.title }}</h3>
             <p class="text-gray-600">
-              Consult with our Toronto team to define your specs, requirements, and branding objectives.
-            </p>
-          </div>
-          
-          <div class="text-center">
-            <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">2</div>
-            <h3 class="text-2xl font-bold mb-4">Sampling</h3>
-            <p class="text-gray-600">
-              Rapid prototyping and shipping from Shenzhen for your approval. Iterate until perfect.
-            </p>
-          </div>
-          
-          <div class="text-center">
-            <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">3</div>
-            <h3 class="text-2xl font-bold mb-4">Mass Production</h3>
-            <p class="text-gray-600">
-              Strict QC and "burn-in" testing. We maintain quality control throughout the production run.
-            </p>
-          </div>
-          
-          <div class="text-center md:col-span-3">
-            <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">4</div>
-            <h3 class="text-2xl font-bold mb-4">Delivery</h3>
-            <p class="text-gray-600 max-w-2xl mx-auto">
-              Direct-to-warehouse shipping with complete logistics management and tracking.
+              {{ step.description }}
             </p>
           </div>
         </div>
@@ -191,6 +173,35 @@
 
 <script setup lang="ts">
 import { generateSeoMeta, seoConfigs } from '@/utils/seo'
+
+interface ProcessStep {
+  number: number
+  title: string
+  description: string
+}
+
+const processSteps: ProcessStep[] = [
+  {
+    number: 1,
+    title: 'Discovery',
+    description: 'Consult with our Toronto team to define your specs, requirements, and branding objectives.',
+  },
+  {
+    number: 2,
+    title: 'Sampling',
+    description: 'Rapid prototyping and shipping from Shenzhen for your approval. Iterate until perfect.',
+  },
+  {
+    number: 3,
+    title: 'Mass Production',
+    description: 'Strict QC and "burn-in" testing. We maintain quality control throughout the production run.',
+  },
+  {
+    number: 4,
+    title: 'Delivery',
+    description: 'Direct-to-warehouse shipping with complete logistics management and tracking.',
+  },
+]
 
 // Define page meta for SEO
 definePageMeta({
