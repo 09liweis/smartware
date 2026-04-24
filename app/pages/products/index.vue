@@ -131,8 +131,25 @@ const categorizedProducts = computed<Record<string, Product[]>>(() => {
   return result
 })
 
-// Selected category filter
-const selectedCategory = ref<string | null>(null)
+const route = useRoute()
+const router = useRouter()
+
+// Selected category filter - initialized from query string
+const selectedCategory = ref<string | null>(route.query.category as string | null || null)
+
+// Watch for category changes and update URL
+watch(selectedCategory, (newCategory) => {
+  if (newCategory) {
+    router.replace({ query: { category: newCategory } })
+  } else {
+    router.replace({ query: {} })
+  }
+})
+
+// Watch for query string changes (e.g., browser back/forward)
+watch(() => route.query.category, (newCategory) => {
+  selectedCategory.value = newCategory as string | null || null
+})
 
 // Total product count
 const totalProductCount = computed(() => {
@@ -147,8 +164,6 @@ const filteredProducts = computed<Product[]>(() => {
   // Return all products when no category selected
   return Object.values(categorizedProducts.value).flat()
 })
-
-const router = useRouter()
 
 function navigateToProduct(productName: string) {
   router.push(`/products/${encodeURIComponent(productName)}`)
