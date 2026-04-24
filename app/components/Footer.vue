@@ -4,9 +4,9 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <!-- Company Info -->
         <div>
-          <h3 class="text-2xl font-bold mb-4">
+          <NuxtLink to="/" class="inline-block text-2xl font-bold mb-4 hover:opacity-80 transition-opacity">
             <span class="text-blue-500">SMART</span><span class="text-white">WARE</span>
-          </h3>
+          </NuxtLink>
           <p class="text-gray-400 mb-4">
             {{ COMPANY.TAGLINE }}
           </p>

@@ -3,14 +3,14 @@
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
-        <div class="flex items-center space-x-3">
+        <NuxtLink to="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
           <div class="text-2xl font-bold tracking-tight">
             <span class="text-blue-500">SMART</span><span class="text-white">WARE</span>
           </div>
           <div class="hidden md:block text-sm text-gray-300">
             {{ COMPANY.TAGLINE }}
           </div>
-        </div>
+        </NuxtLink>
 
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex items-center space-x-8">
