@@ -17,15 +17,7 @@ const structuredData = JSON.stringify({
       '@id': `${COMPANY.WEBSITE}/#organization`,
       name: COMPANY.FULL_NAME,
       url: COMPANY.WEBSITE,
-      logo: {
-        '@type': 'ImageObject',
-        url: COMPANY.LOGO,
-      },
       description: COMPANY.DESCRIPTION,
-      sameAs: [
-        `https://twitter.com/${COMPANY.SOCIAL.TWITTER.replace('@', '')}`,
-        `https://linkedin.com/${COMPANY.SOCIAL.LINKEDIN}`,
-      ],
       address: {
         '@type': 'PostalAddress',
         addressLocality: COMPANY.LOCATIONS.HEADQUARTERS.city,
@@ -39,35 +31,19 @@ const structuredData = JSON.stringify({
       url: COMPANY.WEBSITE,
       name: COMPANY.NAME,
       description: COMPANY.DESCRIPTION,
-      publisher: {
-        '@id': `${COMPANY.WEBSITE}/#organization`,
-      },
+      publisher: { '@id': `${COMPANY.WEBSITE}/#organization` },
     },
   ],
 })
 
-// Global SEO configuration
 useHead({
-  htmlAttrs: {
-    lang: 'en',
-  },
-  link: [
-    {
-      rel: 'icon',
-      type: 'image/x-icon',
-      href: '/favicon.ico',
-    },
-  ],
+  htmlAttrs: { lang: 'en' },
+  link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   meta: [
     { charset: 'utf-8' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     { name: 'format-detection', content: 'telephone=no' },
   ],
-  script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: structuredData,
-    },
-  ],
+  script: [{ type: 'application/ld+json', innerHTML: structuredData }],
 })
 </script>

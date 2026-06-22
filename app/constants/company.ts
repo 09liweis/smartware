@@ -1,48 +1,46 @@
 /**
- * Company constants for Smartware
+ * Company constants for SST-Smartware
  */
 
 export const COMPANY = {
   // Basic Information
-  NAME: 'Smartware',
-  FULL_NAME: 'Smartware Industrial Solutions',
-  TAGLINE: 'Intelligent Industrial Solutions',
-  
+  NAME: 'SST-Smartware',
+  FULL_NAME: 'SST-Smartware Industrial Solutions',
+  TAGLINE: 'High-Precision LED Engineering. Factory-Direct. Locally Managed.',
+
   // Contact Information
-  EMAIL: 'info@smartware-solutions.com',
-  PHONE: '+1 (XXX) XXX-XXXX',
-  
+  EMAIL: 'info@sst-smartware.com',
+  PHONE: '+1 (416) XXX-XXXX',
+
   // Locations
   LOCATIONS: {
     HEADQUARTERS: {
       city: 'Toronto',
       region: 'ON',
       country: 'Canada',
+      label: 'Greater Toronto Area',
     },
     MANUFACTURING: {
       city: 'Shenzhen',
       region: 'Guangdong',
       country: 'China',
+      label: 'Shenzhen Production Facility',
     },
   },
-  
+
   // Social Media
   SOCIAL: {
-    TWITTER: '@smartwaresolutions',
-    LINKEDIN: 'company/smartware-solutions',
-    GITHUB: 'smartware-solutions',
+    TWITTER: '@sstsmartware',
+    LINKEDIN: 'company/sst-smartware',
   },
-  
+
   // URLs
-  WEBSITE: 'https://smartware-solutions.com',
-  LOGO: 'https://smartware-solutions.com/logo.png',
-  
+  WEBSITE: 'https://sst-smartware.com',
+  LOGO: 'https://sst-smartware.com/logo.png',
+
   // Business Description
-  DESCRIPTION: 'Smartware provides intelligent industrial solutions with smart technology integration, factory-direct pricing, and comprehensive support.',
-  
-  // Industry Focus
-  INDUSTRY: ['Industrial Automation', 'Smart Manufacturing', 'IoT Solutions', 'Industrial Lighting'],
-  
+  DESCRIPTION: 'SST-Smartware delivers high-precision commercial LED lighting systems engineered in Shenzhen and managed locally from Toronto. Specializing in OEM, fleet, construction, and industrial illumination.',
+
   // Founding Year
   FOUNDED: 2024,
 } as const

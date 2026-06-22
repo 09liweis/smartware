@@ -1,19 +1,17 @@
 /**
- * SEO Configuration for Smartware
+ * SEO Configuration for SST-Smartware
  */
 import { COMPANY } from '@/constants/company'
 
-// Site-wide SEO configuration
 export const siteConfig = {
   title: COMPANY.FULL_NAME,
-  description: 'Intelligent industrial solutions with smart technology integration, factory-direct pricing, and comprehensive support. Smart manufacturing and IoT solutions engineered in Shenzhen and managed from Toronto.',
-  keywords: 'smart industrial solutions, industrial automation, IoT manufacturing, smartware, factory-direct pricing, North American support, Shenzhen manufacturing, Toronto office, intelligent industrial technology',
-  url: COMPANY.WEBSITE,
+  description: 'High-lumen efficiency, robust thermal management, and extreme weatherproofing built direct from our Shenzhen assembly lines and backed by dedicated North American support.',
+  keywords: 'LED work lights, LED tripods, LED light bars, commercial fleet lighting, industrial LED, B2B lighting, OEM LED manufacturing, construction site lighting, warehouse lighting, rechargeable work lights',
+  url: 'https://sst-smartware.netlify.app',
   ogImage: '/og-image.png',
   twitterHandle: COMPANY.SOCIAL.TWITTER,
 }
 
-// Helper function to generate SEO meta tags
 export const generateSeoMeta = (pageSeo: {
   title?: string
   description?: string
@@ -30,99 +28,57 @@ export const generateSeoMeta = (pageSeo: {
   return {
     title,
     meta: [
-      // Basic meta tags
       { name: 'description', content: description },
       { name: 'keywords', content: keywords },
       { name: 'author', content: siteConfig.title },
-
-      // Open Graph / Facebook
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: url },
       { property: 'og:title', content: title },
       { property: 'og:description', content: description },
       { property: 'og:image', content: image },
       { property: 'og:site_name', content: siteConfig.title },
-
-      // Twitter
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:url', content: url },
       { name: 'twitter:title', content: title },
       { name: 'twitter:description', content: description },
       { name: 'twitter:image', content: image },
       { name: 'twitter:creator', content: siteConfig.twitterHandle },
-
-      // Additional SEO
       { name: 'robots', content: 'index, follow' },
       { name: 'googlebot', content: 'index, follow' },
-      { name: 'language', content: 'English' },
-      { name: 'revisit-after', content: '7 days' },
     ],
-    link: [
-      { rel: 'canonical', href: url },
-    ],
-    script: [
-      {
-        type: 'application/ld+json',
-        children: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Organization',
-          name: siteConfig.title,
-          description: siteConfig.description,
-          url: siteConfig.url,
-          logo: `${siteConfig.url}/logo.png`,
-          sameAs: [
-            'https://twitter.com/powerhouselighting',
-            'https://linkedin.com/company/powerhouse-lighting',
-          ],
-          contactPoint: {
-            '@type': 'ContactPoint',
-            telephone: '+1-XXX-XXX-XXXX',
-            contactType: 'sales',
-            areaServed: 'US,CA',
-            availableLanguage: 'English',
-          },
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: 'Toronto',
-            addressRegion: 'ON',
-            addressCountry: 'CA',
-          },
-        }),
-      },
-    ],
+    link: [{ rel: 'canonical', href: url }],
   }
 }
 
-// Page-specific SEO configurations
 export const seoConfigs = {
   home: {
-    title: 'Intelligent Industrial Solutions',
-    description: 'Smart industrial automation and IoT solutions with factory-direct pricing. Shenzhen smart manufacturing with Toronto-based North American support.',
-    keywords: 'smart industrial solutions, industrial automation, IoT manufacturing, smart technology, factory direct, North American support',
+    title: 'Commercial-Grade LED Hardware Systems',
+    description: 'High-lumen efficiency, robust thermal management, and extreme weatherproofing built direct from Shenzhen assembly lines. Factory-direct pricing with North American support.',
+    keywords: 'LED work lights, commercial LED lighting, industrial LED, B2B lighting, OEM LED, factory-direct lighting',
   },
   products: {
-    title: 'Smart Industrial Products',
-    description: 'Explore our intelligent industrial solutions including automation systems, IoT devices, and smart manufacturing equipment. Technical specifications and features.',
-    keywords: 'industrial automation systems, IoT devices, smart manufacturing equipment, technical specifications, industrial technology',
+    title: 'B2B Technical Catalog',
+    description: 'Explore our commercial-grade LED hardware systems including tripods, light bars, work lights, and rechargeable task lighting. Technical specifications and OEM availability.',
+    keywords: 'LED product catalog, LED work lights, LED tripods, LED light bars, commercial LED hardware, B2B lighting catalog',
   },
   oem: {
-    title: 'OEM & Custom Smart Solutions',
-    description: 'Private label and custom intelligent industrial solutions for distributors and brands. Full OEM/ODM services with custom smart technology integration.',
-    keywords: 'OEM smart solutions, private label industrial technology, custom automation systems, smart technology integration, custom specifications',
+    title: 'OEM & Private Label Manufacturing',
+    description: 'Full-service OEM/ODM solutions for North American distributors. Custom branding, engineering, private labeling, and factory-direct logistics from Shenzhen to Toronto.',
+    keywords: 'OEM LED manufacturing, private label lighting, custom LED branding, factory-direct OEM, Shenzhen manufacturing',
   },
   about: {
-    title: 'About Smartware Industrial Solutions',
-    description: 'Learn about our story - bridging Shenzhen smart manufacturing excellence with Toronto-based North American support for intelligent industrial solutions.',
-    keywords: 'about smartware, company story, smart manufacturing facility, Toronto office, Shenzhen IoT development',
+    title: 'About SST-Smartware',
+    description: 'Bridging Shenzhen manufacturing excellence with Toronto-based North American support. Learn about our 50,000 sq. ft. facility and dedicated local account management.',
+    keywords: 'about SST-Smartware, Shenzhen factory, Toronto LED company, industrial lighting manufacturer, North American LED supplier',
   },
   blog: {
-    title: 'Smart Industrial Blog & Insights',
-    description: 'Industry insights, technical guides, and innovation updates for smart industrial automation, IoT, and manufacturing applications.',
-    keywords: 'smart industrial blog, automation insights, IoT guides, manufacturing case studies, industry 4.0 updates',
+    title: 'Industrial Lighting Blog & Insights',
+    description: 'Industry insights, technical guides, and innovation updates for commercial LED lighting, fleet illumination, and industrial applications.',
+    keywords: 'LED lighting blog, industrial lighting insights, fleet lighting guides, commercial LED articles',
   },
   contact: {
-    title: 'Contact Us for Smart Industrial Solutions',
-    description: 'Get in touch with our Toronto and Shenzhen teams for intelligent industrial solution inquiries, quotes, and technical support.',
-    keywords: 'contact smartware, get a quote, technical support, smart solution inquiry, customer service',
+    title: 'Request RFQ / Contact Us',
+    description: 'Get a factory-direct quote for commercial LED lighting. Contact our Toronto team for wholesale, OEM, and project supply inquiries.',
+    keywords: 'contact SST-Smartware, request LED quote, LED RFQ, commercial lighting inquiry, OEM lighting contact',
   },
 }

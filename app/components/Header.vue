@@ -1,95 +1,169 @@
 <template>
-  <header class="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
-    <div class="container mx-auto px-4">
+  <header class="bg-[#121214] border-b border-[#2D3139] sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-          <div class="text-2xl font-bold tracking-tight">
-            <span class="text-blue-500">SMART</span><span class="text-white">WARE</span>
-          </div>
-          <div class="hidden md:block text-sm text-gray-300">
-            {{ COMPANY.TAGLINE }}
+        <NuxtLink to="/" class="flex items-center space-x-3 hover:opacity-90 transition-opacity shrink-0">
+          <div class="text-xl font-extrabold tracking-tight">
+            <span class="text-[#FF6B00]">SST</span><span class="text-white">-Smartware</span>
           </div>
         </NuxtLink>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center space-x-8">
+        <nav class="hidden lg:flex items-center space-x-1 ml-8">
+          <!-- Home -->
           <NuxtLink
-            v-for="item in MAIN_NAVIGATION"
-            :key="item.path"
-            :to="item.path"
-            class="hover:text-blue-400 transition-colors font-medium"
+            to="/"
+            class="px-3 py-2 text-sm font-medium text-[#9A9EA6] hover:text-white rounded-sm transition-colors"
+            active-class="text-white !font-semibold"
           >
-            {{ item.label }}
+            Home
+          </NuxtLink>
+
+          <!-- Products Dropdown -->
+          <div class="relative group" @mouseenter="activeDropdown = 'products'" @mouseleave="activeDropdown = null">
+            <button
+              class="flex items-center px-3 py-2 text-sm font-medium text-[#9A9EA6] group-hover:text-white rounded-sm transition-colors"
+              :class="{ 'text-white': activeDropdown === 'products' }"
+            >
+              Products
+              <svg class="w-3.5 h-3.5 ml-1 opacity-60 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div
+              v-if="activeDropdown === 'products'"
+              class="absolute top-full left-0 mt-0 w-[480px] bg-[#1C1E22] border border-[#2D3139] rounded-sm shadow-2xl z-50"
+            >
+              <div class="p-4 grid grid-cols-1 gap-1">
+                <NuxtLink
+                  v-for="cat in PRODUCT_CATEGORIES"
+                  :key="cat.path"
+                  :to="cat.path"
+                  class="flex items-start gap-3 px-3 py-2.5 rounded-sm hover:bg-[#121214] border border-transparent hover:border-[#2D3139] transition-all group/link"
+                >
+                  <div>
+                    <div class="text-sm font-semibold text-white group-hover/link:text-[#FF6B00] transition-colors">
+                      {{ cat.label }}
+                    </div>
+                    <div class="text-xs text-[#9A9EA6] mt-0.5">{{ cat.description }}</div>
+                  </div>
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+
+          <!-- Industries Dropdown -->
+          <div class="relative group" @mouseenter="activeDropdown = 'industries'" @mouseleave="activeDropdown = null">
+            <button
+              class="flex items-center px-3 py-2 text-sm font-medium text-[#9A9EA6] group-hover:text-white rounded-sm transition-colors"
+              :class="{ 'text-white': activeDropdown === 'industries' }"
+            >
+              Industries & Solutions
+              <svg class="w-3.5 h-3.5 ml-1 opacity-60 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div
+              v-if="activeDropdown === 'industries'"
+              class="absolute top-full left-0 mt-0 w-[420px] bg-[#1C1E22] border border-[#2D3139] rounded-sm shadow-2xl z-50"
+            >
+              <div class="p-4 grid grid-cols-1 gap-1">
+                <NuxtLink
+                  v-for="ind in INDUSTRY_VERTICALS"
+                  :key="ind.path"
+                  :to="ind.path"
+                  class="flex items-start gap-3 px-3 py-2.5 rounded-sm hover:bg-[#121214] border border-transparent hover:border-[#2D3139] transition-all group/link"
+                >
+                  <div>
+                    <div class="text-sm font-semibold text-white group-hover/link:text-[#FF6B00] transition-colors">
+                      {{ ind.label }}
+                    </div>
+                    <div class="text-xs text-[#9A9EA6] mt-0.5">{{ ind.description }}</div>
+                  </div>
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+
+          <!-- OEM -->
+          <NuxtLink
+            to="/oem"
+            class="px-3 py-2 text-sm font-medium text-[#9A9EA6] hover:text-white rounded-sm transition-colors"
+            active-class="text-white !font-semibold"
+          >
+            OEM / Factory
+          </NuxtLink>
+
+          <!-- Contact -->
+          <NuxtLink
+            to="/contact"
+            class="px-3 py-2 text-sm font-medium text-[#9A9EA6] hover:text-white rounded-sm transition-colors"
+            active-class="text-white !font-semibold"
+          >
+            Request RFQ / Contact
           </NuxtLink>
         </nav>
 
-        <!-- Desktop CTA Button -->
-        <div class="hidden md:block">
+        <!-- Desktop CTA -->
+        <div class="hidden lg:block shrink-0 ml-4">
           <NuxtLink
-            :to="CTA_BUTTON.path"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg inline-block"
+            to="/contact"
+            class="bg-[#FF6B00] hover:bg-[#E65100] text-white text-sm font-bold px-5 py-2.5 rounded-sm transition-colors shadow-structural inline-block tracking-wide"
           >
-            {{ CTA_BUTTON.label }}
+            Request RFQ
           </NuxtLink>
         </div>
 
         <!-- Mobile Menu Button -->
         <button
           @click="isMobileMenuOpen = !isMobileMenuOpen"
-          class="md:hidden p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="lg:hidden p-2 rounded-sm text-[#9A9EA6] hover:text-white hover:bg-[#1C1E22] transition-colors"
           aria-label="Toggle mobile menu"
         >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            :class="{ 'hidden': isMobileMenuOpen, 'block': !isMobileMenuOpen }"
-          >
+          <svg v-if="!isMobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            :class="{ 'block': isMobileMenuOpen, 'hidden': !isMobileMenuOpen }"
-          >
+          <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
       <!-- Mobile Menu -->
-      <div
-        v-if="isMobileMenuOpen"
-        class="md:hidden bg-gray-800 border-t border-gray-700"
-        @click="isMobileMenuOpen = false"
-      >
-        <div class="px-2 pt-2 pb-3 space-y-1">
-          <NuxtLink
-            v-for="item in MAIN_NAVIGATION"
-            :key="item.path"
-            :to="item.path"
-            class="block px-3 py-2 rounded-md text-base font-medium hover:text-blue-400 hover:bg-gray-700 transition-colors"
-          >
-            {{ item.label }}
-          </NuxtLink>
+      <div v-if="isMobileMenuOpen" class="lg:hidden border-t border-[#2D3139] pb-4">
+        <div class="pt-2 space-y-1">
+          <NuxtLink to="/" class="block px-3 py-2.5 text-sm font-medium text-[#9A9EA6] hover:text-white hover:bg-[#1C1E22] rounded-sm" @click="isMobileMenuOpen = false">Home</NuxtLink>
 
-          <!-- Mobile CTA Button -->
-          <div class="pt-4 px-3">
-            <NuxtLink
-              :to="CTA_BUTTON.path"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-md inline-block text-center"
-            >
-              {{ CTA_BUTTON.label }}
-            </NuxtLink>
+          <!-- Mobile Products -->
+          <div class="px-3 py-2">
+            <button @click="mobileProductsOpen = !mobileProductsOpen" class="flex items-center justify-between w-full text-sm font-medium text-[#9A9EA6] hover:text-white">
+              Products
+              <svg :class="{ 'rotate-180': mobileProductsOpen }" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            <div v-if="mobileProductsOpen" class="mt-1 ml-3 space-y-1 border-l border-[#2D3139] pl-3">
+              <NuxtLink v-for="cat in PRODUCT_CATEGORIES" :key="cat.path" :to="cat.path" class="block px-2 py-2 text-sm text-[#9A9EA6] hover:text-white rounded-sm" @click="isMobileMenuOpen = false">{{ cat.label }}</NuxtLink>
+            </div>
           </div>
 
-          <!-- Mobile Tagline -->
-          <div class="pt-4 px-3 text-sm text-gray-400 text-center">
-            {{ COMPANY.TAGLINE }}
+          <!-- Mobile Industries -->
+          <div class="px-3 py-2">
+            <button @click="mobileIndustriesOpen = !mobileIndustriesOpen" class="flex items-center justify-between w-full text-sm font-medium text-[#9A9EA6] hover:text-white">
+              Industries & Solutions
+              <svg :class="{ 'rotate-180': mobileIndustriesOpen }" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            <div v-if="mobileIndustriesOpen" class="mt-1 ml-3 space-y-1 border-l border-[#2D3139] pl-3">
+              <NuxtLink v-for="ind in INDUSTRY_VERTICALS" :key="ind.path" :to="ind.path" class="block px-2 py-2 text-sm text-[#9A9EA6] hover:text-white rounded-sm" @click="isMobileMenuOpen = false">{{ ind.label }}</NuxtLink>
+            </div>
+          </div>
+
+          <NuxtLink to="/oem" class="block px-3 py-2.5 text-sm font-medium text-[#9A9EA6] hover:text-white hover:bg-[#1C1E22] rounded-sm" @click="isMobileMenuOpen = false">OEM / Factory Capabilities</NuxtLink>
+          <NuxtLink to="/contact" class="block px-3 py-2.5 text-sm font-medium text-[#9A9EA6] hover:text-white hover:bg-[#1C1E22] rounded-sm" @click="isMobileMenuOpen = false">Request RFQ / Contact Us</NuxtLink>
+
+          <div class="pt-4 px-3">
+            <NuxtLink to="/contact" class="block w-full bg-[#FF6B00] hover:bg-[#E65100] text-white text-sm font-bold py-3 px-4 rounded-sm text-center transition-colors tracking-wide" @click="isMobileMenuOpen = false">
+              Request RFQ
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -98,49 +172,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { MAIN_NAVIGATION, CTA_BUTTON } from '@/constants/navigation'
-import { COMPANY } from '@/constants/company'
+import { ref } from 'vue'
+import { PRODUCT_CATEGORIES, INDUSTRY_VERTICALS } from '@/constants/navigation'
 
 const isMobileMenuOpen = ref(false)
-
-// Close mobile menu when clicking outside
-const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
-  if (isMobileMenuOpen.value && !target.closest('.md\\:hidden')) {
-    isMobileMenuOpen.value = false
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+const mobileProductsOpen = ref(false)
+const mobileIndustriesOpen = ref(false)
+const activeDropdown = ref<string | null>(null)
 </script>
-
-<style scoped>
-.router-link-active {
-  color: #60a5fa;
-  font-weight: 600;
-}
-
-/* Smooth transitions */
-header {
-  transition: all 0.3s ease;
-}
-
-/* Mobile menu animations */
-.mobile-menu-enter-active,
-.mobile-menu-leave-active {
-  transition: all 0.3s ease;
-}
-
-.mobile-menu-enter-from,
-.mobile-menu-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-</style>
